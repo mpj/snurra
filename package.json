@@ -1,0 +1,22 @@
+{
+  "name": "snurra",
+  "version": "1.0.0",
+  "description": "A communication bus with a strict request/response interface, aiming to make unit testing simpler, by treating side effects as data. Edit",
+  "main": "snurra.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mpj/snurra.git"
+  },
+  "author": "Mattias Petter Johansson <mpj@mpj.me>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mpj/snurra/issues"
+  },
+  "homepage": "https://github.com/mpj/snurra#readme",
+  "dependencies": {
+    "jest": "^21.2.1"
+  }
+}
