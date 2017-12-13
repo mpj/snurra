@@ -1,3 +1,18 @@
+const routine = (isPure, name) => {
+  const api = {
+    name,
+    isPure,
+    handlers: {},
+    started: handler => {
+      api.handlers.started = handler
+      return api
+    }
+  }
+  return api
+}
+const pureRoutine = routine.bind(null, true)
+pureRoutine.impure = routine.bind(null, false)
+
 module.exports = {
   bus: () => {
     const installedRoutines = {}
@@ -21,22 +36,11 @@ module.exports = {
           const value = valueOrIntent
           return Promise.resolve(value)
         }
-
       }
     }
     return api
   },
-  routine: name => {
-    const api = {
-      name,
-      handlers: {},
-      started: handler => {
-        api.handlers.started = handler
-        return api
-      }
-    }
-    return api
-  },
+  routine: pureRoutine,
   request: (name, payload) => ({
     $request: { name, payload }
   })
