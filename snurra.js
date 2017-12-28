@@ -34,6 +34,11 @@ module.exports = {
           )
         } else {
           const value = valueOrIntent
+          if (value instanceof Promise && routine.isPure) {
+            return Promise.reject(
+              new Error('Handler of impure routine is not allowed to return promises')
+            )
+          }
           return Promise.resolve(value)
         }
       }

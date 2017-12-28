@@ -36,7 +36,17 @@ it('handler of impure routine can return a promise', () => {
   )
 })
 
-it('handler of pure routine cannot return a promise')
+it('handler of pure routine cannot return a promise', () => {
+  const app = bus()
+  app.install(
+    routine('hello').started(() => {
+      return new Promise(() => {})
+    })
+  )
+  return expect(
+    app.request('hello')
+  ).rejects.toThrow('Handler of impure routine is not allowed to return promises')
+})
 
 it('can do things', () => {
   const app = bus()
