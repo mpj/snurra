@@ -44,7 +44,7 @@ it('handler of pure routine cannot return a promise', () => {
   ).rejects.toThrow('Handler of impure routine is not allowed to return promises')
 })
 
-it('can do things', () => {
+it('request handler can return values', () => {
   const app = bus()
   app.install(
     routine('hello').started(() =>
