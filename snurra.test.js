@@ -4,10 +4,6 @@ const {
   request
  } = require('./snurra')
 
-it('can create a bus', () => {
-  const app = bus()
-})
-
 it('handlers can issue requests', () => {
   const app = bus()
   app.install(
