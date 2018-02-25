@@ -4,12 +4,16 @@ const pipe = (...funcs) => arg =>
   funcs.reduce((prev, cur) =>
     prev.then(x => cur(x, arg)), Promise.resolve(arg))
 
-const routine = (isPure, name) => {
+const routine = (name) => {
   const api = {
     name,
-    isPure,
+    isPure: true,
     handlers: {
       after: {}
+    },
+    impure: () => {
+      api.isPure = false
+      return api
     },
     started: handler => {
       api.handlers.started = handler
@@ -22,9 +26,6 @@ const routine = (isPure, name) => {
   }
   return api
 }
-
-const pureRoutine = routine.bind(null, true)
-pureRoutine.impure = routine.bind(null, false)
 
 module.exports = {
   bus: () => {
@@ -69,7 +70,7 @@ module.exports = {
       request: (name, payload) => makeRequest({ name, payload }),
     }
   },
-  routine: pureRoutine,
+  routine,
   request: (name, payload) => ({
     $request: { name, payload }
   })

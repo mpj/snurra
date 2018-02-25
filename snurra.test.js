@@ -1,6 +1,7 @@
 const {
   bus,
   routine,
+  impure,
   request
  } = require('./snurra')
 
@@ -70,7 +71,7 @@ it('handler of impure routine can return a promise', () => {
     routine('hello').started(val => {
       return request('async-capitalize', val)
     }),
-    routine.impure('async-capitalize')
+    impure.routine('async-capitalize')
       .started(val => Promise.resolve(val.toUpperCase()))
   )
   return app.request('hello', 'world').then(result =>
