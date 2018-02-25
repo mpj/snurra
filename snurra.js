@@ -2,9 +2,15 @@ const routine = (isPure, name) => {
   const api = {
     name,
     isPure,
-    handlers: {},
+    handlers: {
+      after: {}
+    },
     started: handler => {
       api.handlers.started = handler
+      return api
+    },
+    after: (responseName, handler) => {
+      api.handlers.after[responseName] = handler
       return api
     }
   }
@@ -28,10 +34,12 @@ module.exports = {
         const valueOrIntent = routine.handlers.started(payload)
         if (valueOrIntent.$request) {
           const intent = valueOrIntent
-          return api.request(
-            intent.$request.name,
+          const responseValuePromise = api.request(
+            intent.$request.name/*?*/,
             intent.$request.payload
           )
+          return responseValuePromise
+            .then(installedRoutines.hello.handlers.after[intent.$request.name])
         } else {
           const value = valueOrIntent
           if (value instanceof Promise && routine.isPure) {
@@ -41,7 +49,7 @@ module.exports = {
           }
           return Promise.resolve(value)
         }
-      }
+      },
     }
     return api
   },

@@ -4,6 +4,20 @@ const {
   request
  } = require('./snurra')
 
+it.only('can handle response', () => {
+  const app = bus()
+  app.install(
+    routine('hello')
+      .started(val => request('capitalize', val))
+      .after('capitalize',
+        val => val.substring(0,3)),
+    routine('capitalize')
+      .started(val => val.toUpperCase())
+  )
+  return app.request('hello', 'world').then(result =>
+    expect(result).toBe('WOR'))
+})
+
 it('handlers can issue requests', () => {
   const app = bus()
   app.install(
