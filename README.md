@@ -11,9 +11,14 @@ All this is super early sketch level, but this is sort of the API we are going f
 // usage example
 const { routine, request, state } = snurra
 module.exports = routine('user')
-  .start(id => request('friends', id))
-  .then(friends => state({ friends }).request('avatar')) // shorthand for handling all responses from previous handler
-  .after('avatar', (avatar, { friends }) => ({ friends, avatar }))
+  .inspect.start(id => request('friends', id)) // <- inspect will log info about start requests to web service
+  .after('friends', friends => state({ friends }).request('avatar'))
+  .after((avatar, { friends }) => ({ friends, avatar })) // <- can omit request name for handling all responses from previous handler.
+
+// Comparison to closures:
+module.exports = function user(id) {
+  friends(id).then(friends => avatar().then(avatar => { friends, avatar }))
+}
 
 const given = spec(require('./user'))
 
