@@ -4,7 +4,7 @@ const {
   request
  } = require('./snurra')
 
-it.only('can handle response', () => {
+it('can handle response', () => {
   const app = bus()
   app.install(
     routine('hello')
@@ -14,7 +14,8 @@ it.only('can handle response', () => {
     routine('capitalize')
       .started(val => val.toUpperCase())
   )
-  return app.request('hello', 'world').then(result =>
+  return app.request('hello', 'world')
+  .then(result =>
     expect(result).toBe('WOR'))
 })
 
