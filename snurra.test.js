@@ -19,6 +19,17 @@ it('can handle response', () => {
     expect(result).toBe('WOR'))
 })
 
+it('throws if handler tries to issue request to nonexisting routine', () => {
+  const app = bus()
+  app.install(
+    routine('hello').started(() =>
+      request('wishful-thinking')
+    )
+  )
+  return expect(app.request('hello'))
+    .rejects.toThrow('Routine "wishful-thinking" was not installed')
+})
+
 it('handlers can issue requests', () => {
   const app = bus()
   app.install(

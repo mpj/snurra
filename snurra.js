@@ -31,6 +31,9 @@ module.exports = {
       },
       request: (name, payload) => {
         const routine = installedRoutines[name]
+        if(!routine)
+          return Promise.reject(
+            new Error('Routine "wishful-thinking" was not installed'))
         const valueOrIntent = routine.handlers.started(payload)
         if (valueOrIntent.$request) {
           const intent = valueOrIntent
