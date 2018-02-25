@@ -35,7 +35,7 @@ module.exports = {
         if (valueOrIntent.$request) {
           const intent = valueOrIntent
           const responseValuePromise = api.request(
-            intent.$request.name/*?*/,
+            intent.$request.name,
             intent.$request.payload
           )
           return responseValuePromise
