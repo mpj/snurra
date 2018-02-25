@@ -4,8 +4,6 @@ const pipe = (...funcs) => arg =>
   funcs.reduce((prev, cur) =>
     prev.then(x => cur(x, arg)), Promise.resolve(arg))
 
-
-module.exports = pipe
 const routine = (isPure, name) => {
   const api = {
     name,
