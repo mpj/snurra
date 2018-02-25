@@ -26,6 +26,7 @@ it('rejects if handler tries to issue request to nonexisting routine', () => {
       request('wishful-thinking')
     )
   )
+  // TODO: improve this error message, hint about cause
   return expect(app.request('hello'))
     .rejects.toThrow('Routine "wishful-thinking" was not installed')
 })
@@ -40,12 +41,14 @@ it('rejects if response handler tries to issue request to nonexisting routine', 
     routine('getfriends')
       .started(() => 'x')
   )
+  // TODO: improve this error message, hint about cause
   return expect(app.request('getuser'))
     .rejects.toThrow('Routine "getavatars" was not installed')
 })
 
 it('throws if routine is called with more than one argument')
 it('throws if routine is installed that lacks started handler')
+it('throws if routine is already installed')
 
 it('handlers can issue requests', () => {
   const app = bus()

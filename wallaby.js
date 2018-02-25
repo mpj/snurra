@@ -3,7 +3,7 @@ module.exports = function () {
   return {
     files: ['snurra.js'],
 
-    tests: ['snurra.test.js'],
+    tests: ['*.test.js'],
 
     env: {
       type: 'node',

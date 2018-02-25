@@ -1,3 +1,11 @@
+const R = require('ramda')
+
+const pipe = (...funcs) => arg =>
+  funcs.reduce((prev, cur) =>
+    prev.then(x => cur(x, arg)), Promise.resolve(arg))
+
+
+module.exports = pipe
 const routine = (isPure, name) => {
   const api = {
     name,
@@ -16,53 +24,52 @@ const routine = (isPure, name) => {
   }
   return api
 }
+
 const pureRoutine = routine.bind(null, true)
 pureRoutine.impure = routine.bind(null, false)
 
 module.exports = {
   bus: () => {
-    const installedRoutines = {}
+    const
+      installedRoutines = {},
 
-    function processValue(value) {
-      if (value instanceof Promise && routine.isPure) {
-        return Promise.reject(
-          new Error('Handler of impure routine is not allowed to return promises')
-        )
-      }
-      return Promise.resolve(value)
-    }
-    function processRequestIntent(intent) {
-      const responseHandler = routine.handlers.after[intent.$request.name]
-      const responseValuePromise = api.request(
-        intent.$request.name,
-        intent.$request.payload
+      // Takes the result from a handler function, which
+      // can be an intent or a normal value, and returns a
+      // promise that resolves the final value.
+      handlerResultResolver = routine => R.cond([
+
+        // Request intent
+        // The most common type of intent - a request to another routine.
+        [ R.has('$request'), intent =>
+          makeRequest(intent.$request)
+            .then(routine.handlers.after[intent.$request.name])
+            .then(handlerResultResolver(routine))],
+
+        // Value
+        // When the handler returns a plain value, just wrap it in a promise
+        // and return. If it is a promise, crash if the routine isn't marked
+        // as impure.
+        [ R.T, value => value instanceof Promise && routine.isPure
+          ? Promise.reject(new Error('Handler of impure routine is not allowed to return promises'))
+          : Promise.resolve(value)
+        ]
+      ]),
+
+      makeRequest = pipe(
+        request => installedRoutines[request.name] ||
+          Promise.reject(new Error(`Routine "${request.name}" was not installed`)),
+        (routine, request) =>
+          handlerResultResolver(routine)(routine.handlers.started(request.payload)),
       )
-      return responseValuePromise
-        .then(responseHandler)
-    }
-    const processHandlerResult = (valueOrIntent) =>
-      valueOrIntent.$request
-        ? processRequestIntent(valueOrIntent)
-        : processValue(valueOrIntent)
 
-    const api = {
-      install: (...routines) => {
+      install = (...routines) =>
         routines.forEach(routine =>
-          installedRoutines[routine.name] =
-            routine
-        )
-      },
+          installedRoutines[routine.name] = routine)
 
-      request: (name, payload) => {
-        const routine = installedRoutines[name]
-        if(!routine)
-          return Promise.reject(
-            new Error(`Routine "${name}" was not installed`))
-        return processHandlerResult(routine.handlers.started(payload))
-
-      },
+    return {
+      install,
+      request: (name, payload) => makeRequest({ name, payload }),
     }
-    return api
   },
   routine: pureRoutine,
   request: (name, payload) => ({
